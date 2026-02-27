@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MCP CN SESI - Joana Sampaio</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+</head>
+
+<body class="logged-out">
+    <div class="background-glow"></div>
+
+    <!-- Login Simulation -->
+    <div id="login-overlay" class="overlay">
+        <div class="card login-card">
+            <h2>Portal Admin CN SESI</h2>
+            <p style="margin-bottom: 1.5rem; color: var(--text-muted);">Acesso exclusivo para Administrador do Sistema.
+            </p>
+            <div class="form-group">
+                <input type="password" id="login-token" placeholder="Token de Acesso (admin-joana-secret-123)">
+            </div>
+            <button class="btn" style="width: 100%;" onclick="attemptLogin()">Acessar MCP</button>
+        </div>
+    </div>
+
+    <nav class="sidebar">
+        <div class="logo-area">
+            <div class="logo-icon">S</div>
+            <div>
+                <h2 style="font-size: 1.1rem;">MCP CN SESI</h2>
+                <p style="font-size: 0.7rem; color: var(--accent-primary);">Enterprise Core</p>
+            </div>
+        </div>
+
+        <ul class="nav-links">
+            <li class="nav-item active" onclick="showView('dashboard')">
+                <span>🏠</span> Dashboard
+            </li>
+            <li class="nav-item" onclick="showView('sistemas')">
+                <span>⚙️</span> Gestão de Sistemas
+            </li>
+            <li class="nav-item" onclick="showView('relatorios')">
+                <span>📊</span> Relatórios IA
+            </li>
+            <li class="nav-item" onclick="showView('usuarios')">
+                <span>👥</span> Gestão de Usuários
+            </li>
+            <li class="nav-item" onclick="showView('quilbe')">
+                <span>🤖</span> Assistente Quilbe
+            </li>
+        </ul>
+
+        <div class="nav-item" style="margin-top: auto;" onclick="logout()">
+            <span>🚪</span> Sair
+        </div>
+    </nav>
+
+    <main class="main-content">
+        <header>
+            <div>
+                <h1 id="view-title">Dashboard Operacional</h1>
+                <p id="welcome-msg" style="color: var(--text-muted); font-size: 0.9rem;">Olá, Joana. Monitorando SORS,
+                    TOTVS e outros 4 sistemas.</p>
+            </div>
+            <div class="status-pills">
+                <div class="pill"><span class="dot online"></span> SORS Core</div>
+                <div class="pill"><span class="dot online"></span> TOTVS ERP</div>
+            </div>
+        </header>
+
+        <!-- View: Dashboard -->
+        <section id="dashboard" class="view active">
+            <div class="stats-grid">
+                <div class="card">
+                    <div class="card-title">Disponibilidade Global</div>
+                    <div class="card-value">100%</div>
+                </div>
+                <div class="card">
+                    <div class="card-title">Consultas realizadas (IA)</div>
+                    <div class="card-value">1,242</div>
+                </div>
+                <div class="card">
+                    <div class="card-title">Último Relatório RH</div>
+                    <div class="card-value" style="font-size: 1.2rem;">Gerado às 09:30</div>
+                </div>
+            </div>
+
+            <div class="card">
+                <h3>Resumo Executivo (IA Quilbe)</h3>
+                <p id="ai-summary" style="color: var(--text-muted); padding: 1rem 0;">Pressione 'Gerar Relatório' em
+                    Relatórios IA para analisar os novos dados integrados.</p>
+            </div>
+        </section>
+
+        <!-- View: Sistemas (Gestão de Integração) -->
+        <section id="sistemas" class="view">
+            <div class="card" style="margin-bottom: 2rem; border-left: 4px solid var(--accent-primary);">
+                <h3 style="margin-bottom: 1rem;">Configuração Global de IA (Quilbe)</h3>
+                <p style="font-size: 0.9rem; color: var(--text-muted); margin-bottom: 1.5rem;">Configure para usar o
+                    Ollama local ou sua própria ferramenta de IA.</p>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                    <div class="form-group">
+                        <label>Tipo de Conexão</label>
+                        <select id="ai-type">
+                            <option value="Ollama">Ollama Local (Padrão)</option>
+                            <option value="Custom">API Quilbe Customizada</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Endpoint / URL da API</label>
+                        <input type="text" id="ai-endpoint" placeholder="http://localhost:11434/api/generate">
+                    </div>
+                    <div class="form-group">
+                        <label>Chave de API (Secret Key)</label>
+                        <input type="password" id="ai-key" placeholder="opcional">
+                    </div>
+                    <div class="form-group" style="display: flex; align-items: flex-end;">
+                        <button class="btn btn-secondary" style="width: 100%;" onclick="saveAIConfig()">Salvar
+                            Configuração de IA</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card">
+                <h3 style="margin-bottom: 2rem;">Configuração de Bancos SQL Server</h3>
+                <div id="systems-list">
+                    <!-- Gerado via JS -->
+                </div>
+            </div>
+
+            <!-- Modal/Form de Edição (Simulado) -->
+            <div id="edit-form" class="card"
+                style="display: none; margin-top: 1.5rem; border-color: var(--accent-primary);">
+                <h4 id="edit-title">Editar Conexão</h4>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-top: 1rem;">
+                    <div class="form-group">
+                        <label>Host / IP</label>
+                        <input type="text" id="db-host">
+                    </div>
+                    <div class="form-group">
+                        <label>Banco de Dados</label>
+                        <input type="text" id="db-name">
+                    </div>
+                    <div class="form-group">
+                        <label>Usuário</label>
+                        <input type="text" id="db-user">
+                    </div>
+                    <div class="form-group">
+                        <label>Senha</label>
+                        <input type="password" id="db-pass">
+                    </div>
+                </div>
+                <button class="btn" onclick="saveSystemConfig()">Salvar Alterações</button>
+                <button class="btn" style="background: var(--text-muted);" onclick="closeEdit()">Cancelar</button>
+            </div>
+        </section>
+
+        <!-- View: Relatórios -->
+        <section id="relatorios" class="view">
+            <div class="stats-grid">
+                <div class="card" onclick="runReport('SORS')" style="cursor: pointer;">
+                    <h4>SORS Financeiro</h4>
+                    <p style="font-size: 0.8rem; color: var(--text-muted);">Clique para gerar relatório IA</p>
+                </div>
+                <div class="card" onclick="runReport('TOTVS')" style="cursor: pointer;">
+                    <h4>TOTVS ERP</h4>
+                    <p style="font-size: 0.8rem; color: var(--text-muted);">Clique para gerar relatório IA</p>
+                </div>
+                <div class="card" onclick="runReport('RH')" style="cursor: pointer;">
+                    <h4>RH Central</h4>
+                    <p style="font-size: 0.8rem; color: var(--text-muted);">Clique para gerar relatório IA</p>
+                </div>
+            </div>
+
+            <div id="report-output" class="result-area" style="margin-top: 2rem; min-height: 200px;">
+                <h3 id="report-title">Relatório Consolidado</h3>
+                <div id="report-content" style="white-space: pre-line; line-height: 1.8;">
+                    Selecione um módulo acima para que o Quilbe processe os dados.
+                </div>
+            </div>
+        </section>
+
+        <!-- View: Usuários (Gestão de Acessos) -->
+        <section id="usuarios" class="view">
+            <div class="card">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
+                    <h3>Gestão de Usuários e Acessos</h3>
+                    <button class="btn" onclick="openUserForm()">+ Novo Usuário</button>
+                </div>
+                <div id="users-list">
+                    <!-- Gerado via JS -->
+                </div>
+            </div>
+
+            <!-- Modal/Form de Usuário -->
+            <div id="user-form" class="card"
+                style="display: none; margin-top: 1.5rem; border-color: var(--accent-secondary);">
+                <h4 id="user-form-title">Cadastrar Novo Usuário</h4>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-top: 1rem;">
+                    <div class="form-group">
+                        <label>Nome Completo</label>
+                        <input type="text" id="user-name">
+                    </div>
+                    <div class="form-group">
+                        <label>Token de Acesso</label>
+                        <input type="text" id="user-token-input">
+                    </div>
+                    <div class="form-group">
+                        <label>Função (Role)</label>
+                        <select id="user-role">
+                            <option value="Colaborador">Colaborador (Visualizador)</option>
+                            <option value="Gestor">Gestor (Relatórios)</option>
+                            <option value="Admin">Administrador (Total)</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Sistemas Autorizados</label>
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 5px; font-size: 0.8rem;">
+                            <label style="display:flex; gap:5px;"><input type="checkbox" value="SORS"> SORS</label>
+                            <label style="display:flex; gap:5px;"><input type="checkbox" value="TOTVS"> TOTVS</label>
+                            <label style="display:flex; gap:5px;"><input type="checkbox" value="RH"> RH</label>
+                            <label style="display:flex; gap:5px;"><input type="checkbox" value="Financeiro">
+                                Financeiro</label>
+                        </div>
+                    </div>
+                </div>
+                <button class="btn btn-secondary" onclick="saveUser()">Salvar Usuário</button>
+                <button class="btn" style="background: var(--text-muted);" onclick="closeUserForm()">Cancelar</button>
+            </div>
+        </section>
+
+        <!-- View: Quilbe (Chat) -->
+        <section id="quilbe" class="view">
+            <div class="chat-container">
+                <div class="chat-messages" id="chat-messages">
+                    <div class="message quilbe">
+                        Olá Joana! Estou pronto para processar dados de SORS, TOTVS, RH e seus outros sistemas. O que
+                        você precisa analisar agora?
+                    </div>
+                </div>
+                <div class="chat-input-area">
+                    <input type="text" id="chat-input" placeholder="Joana, pergunte algo sobre seus bancos de dados...">
+                    <button class="btn btn-secondary" onclick="sendMessage()">Perguntar</button>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <script src="app.js"></script>
+</body>
+
+</html>

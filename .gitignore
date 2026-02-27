@@ -1,0 +1,14 @@
+# Configurações sensíveis (Bancos e Usuários)
+Config/SystemRegistry.json
+Config/SystemRegistry.json.template
+Config/UserRegistry.json
+
+# .NET / VS Code
+bin/
+obj/
+.vscode/
+*.user
+*.suo
+
+# Outros
+DOCS_INTEGRACAO_QUILBE.md

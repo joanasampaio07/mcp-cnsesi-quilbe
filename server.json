@@ -1,0 +1,16 @@
+{
+    "mcpServers": {
+        "mcp-cn-sesi": {
+            "command": "dotnet",
+            "args": [
+                "run",
+                "--project",
+                "C:/Users/joana.sampaio/.gemini/antigravity/scratch/mcp-sesi-server/McpSesiServer.csproj"
+            ],
+            "env": {
+                "SESI_DB_CONNECTION": "Environment variable expected",
+                "MCP_API_KEY": "Environment variable expected"
+            }
+        }
+    }
+}
