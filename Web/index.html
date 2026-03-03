@@ -17,13 +17,12 @@
     <!-- Login Simulation -->
     <div id="login-overlay" class="overlay">
         <div class="card login-card">
-            <h2>Portal Admin CN SESI</h2>
-            <p style="margin-bottom: 1.5rem; color: var(--text-muted);">Acesso exclusivo para Administrador do Sistema.
-            </p>
+            <h2>Portal CN SESI</h2>
+            <p style="margin-bottom: 1.5rem; color: var(--text-muted);">Acesso exclusivo ao sistema</p>
             <div class="form-group">
-                <input type="password" id="login-token" placeholder="Token de Acesso (admin-joana-secret-123)">
+                <input type="password" id="login-token" placeholder="Token de Acesso">
             </div>
-            <button class="btn" style="width: 100%;" onclick="attemptLogin()">Acessar MCP</button>
+            <button class="btn" style="width: 100%;" onclick="attemptLogin()">Acessar</button>
         </div>
     </div>
 
@@ -32,24 +31,27 @@
             <div class="logo-icon">S</div>
             <div>
                 <h2 style="font-size: 1.1rem;">MCP CN SESI</h2>
-                <p style="font-size: 0.7rem; color: var(--accent-primary);">Enterprise Core</p>
+                <p style="font-size: 0.65rem; color: var(--accent-primary);">cnsesi.com.br</p>
             </div>
         </div>
 
         <ul class="nav-links">
-            <li class="nav-item active" onclick="showView('dashboard')">
+            <li class="nav-item active" onclick="showView('dashboard')" data-min-role="Funcionario">
                 <span>🏠</span> Dashboard
             </li>
-            <li class="nav-item" onclick="showView('sistemas')">
+            <li class="nav-item" onclick="showView('sistemas')" data-min-role="Admin">
                 <span>⚙️</span> Gestão de Sistemas
             </li>
-            <li class="nav-item" onclick="showView('relatorios')">
+            <li class="nav-item" onclick="showView('relatorios')" data-min-role="Funcionario">
                 <span>📊</span> Relatórios IA
             </li>
-            <li class="nav-item" onclick="showView('usuarios')">
+            <li class="nav-item" onclick="showView('usuarios')" data-min-role="Admin">
                 <span>👥</span> Gestão de Usuários
             </li>
-            <li class="nav-item" onclick="showView('quilbe')">
+            <li class="nav-item" onclick="showView('monitoramento')" data-min-role="Admin">
+                <span>🛡️</span> Monitoramento
+            </li>
+            <li class="nav-item" onclick="showView('quilbe')" data-min-role="Funcionario">
                 <span>🤖</span> Assistente Quilbe
             </li>
         </ul>
@@ -63,12 +65,8 @@
         <header>
             <div>
                 <h1 id="view-title">Dashboard Operacional</h1>
-                <p id="welcome-msg" style="color: var(--text-muted); font-size: 0.9rem;">Olá, Joana. Monitorando SORS,
-                    TOTVS e outros 4 sistemas.</p>
-            </div>
-            <div class="status-pills">
-                <div class="pill"><span class="dot online"></span> SORS Core</div>
-                <div class="pill"><span class="dot online"></span> TOTVS ERP</div>
+                <p id="welcome-msg" style="color: var(--text-muted); font-size: 0.9rem;">Portal de Gestão e
+                    Monitoramento CN SESI</p>
             </div>
         </header>
 
@@ -162,18 +160,7 @@
         <!-- View: Relatórios -->
         <section id="relatorios" class="view">
             <div class="stats-grid">
-                <div class="card" onclick="runReport('SORS')" style="cursor: pointer;">
-                    <h4>SORS Financeiro</h4>
-                    <p style="font-size: 0.8rem; color: var(--text-muted);">Clique para gerar relatório IA</p>
-                </div>
-                <div class="card" onclick="runReport('TOTVS')" style="cursor: pointer;">
-                    <h4>TOTVS ERP</h4>
-                    <p style="font-size: 0.8rem; color: var(--text-muted);">Clique para gerar relatório IA</p>
-                </div>
-                <div class="card" onclick="runReport('RH')" style="cursor: pointer;">
-                    <h4>RH Central</h4>
-                    <p style="font-size: 0.8rem; color: var(--text-muted);">Clique para gerar relatório IA</p>
-                </div>
+                <!-- Gerado dinamicamente via app.js -->
             </div>
 
             <div id="report-output" class="result-area" style="margin-top: 2rem; min-height: 200px;">
@@ -181,6 +168,188 @@
                 <div id="report-content" style="white-space: pre-line; line-height: 1.8;">
                     Selecione um módulo acima para que o Quilbe processe os dados.
                 </div>
+            </div>
+        </section>
+
+        <!-- View: Monitoramento (Infra & Segurança) -->
+        <section id="monitoramento" class="view noc-dashboard" style="position: relative;">
+            <div class="scanline"></div>
+
+            <div class="noc-grid">
+                <!-- Row 1: VM Graphics Section -->
+                <div style="grid-column: span 12;" class="section-header">VM - Graphics</div>
+
+                <!-- CPU & RAM Column -->
+                <div class="noc-card" style="grid-column: span 3; gap: 20px;">
+                    <div class="gauge-box">
+                        <h4>CPU utilization</h4>
+                        <svg class="gauge-svg" viewBox="0 0 140 70">
+                            <path class="gauge-bg" d="M10,60 A60,60 0 0,1 130,60"></path>
+                            <path class="gauge-fill" d="M10,60 A60,60 0 0,1 130,60"
+                                style="stroke-dashoffset: 160; stroke: #2ea043;"></path>
+                        </svg>
+                        <div class="gauge-val">11.8%</div>
+                    </div>
+                    <div class="gauge-box">
+                        <h4>Memory RAM</h4>
+                        <svg class="gauge-svg" viewBox="0 0 140 70">
+                            <path class="gauge-bg" d="M10,60 A60,60 0 0,1 130,60"></path>
+                            <path class="gauge-fill" d="M10,60 A60,60 0 0,1 130,60"
+                                style="stroke-dashoffset: 70; stroke: #f39c12;"></path>
+                        </svg>
+                        <div class="gauge-val">64.8%</div>
+                    </div>
+                </div>
+
+                <!-- Disk Column -->
+                <div class="noc-card" style="grid-column: span 3; gap: 20px;">
+                    <div class="gauge-box">
+                        <h4>Disk Usage</h4>
+                        <svg class="gauge-svg" viewBox="0 0 140 70">
+                            <path class="gauge-bg" d="M10,60 A60,60 0 0,1 130,60"></path>
+                            <path class="gauge-fill" d="M10,60 A60,60 0 0,1 130,60"
+                                style="stroke-dashoffset: 40; stroke: #eb2f06;"></path>
+                        </svg>
+                        <div class="gauge-val">76.4%</div>
+                    </div>
+                    <div class="gauge-box">
+                        <h4>Disk Free Space GB</h4>
+                        <svg class="gauge-svg" viewBox="0 0 140 70">
+                            <path class="gauge-bg" d="M10,60 A60,60 0 0,1 130,60"></path>
+                            <path class="gauge-fill" d="M10,60 A60,60 0 0,1 130,60"
+                                style="stroke-dashoffset: 20; stroke: #2ea043;"></path>
+                        </svg>
+                        <div class="gauge-val">94.3</div>
+                    </div>
+                </div>
+
+                <!-- Network Interface Line Chart -->
+                <div class="noc-card" style="grid-column: span 3;">
+                    <h4>Network Interface</h4>
+                    <div style="font-size: 0.6rem; color: #8b949e; margin-bottom: 5px;">1.40 Mb/s</div>
+                    <div class="chart-grid-bg"
+                        style="height: 140px; border-left: 1px solid #333; border-bottom: 1px solid #333; position: relative; background: #000;">
+                        <div class="spark-wave"></div>
+                        <div
+                            style="position: absolute; bottom: -15px; width: 100%; display: flex; justify-content: space-between; font-size: 0.5rem; color: #333;">
+                            <span>04:00</span><span>08:00</span><span>12:00</span><span>14:00</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Event for Seconds & Big Numbers -->
+                <div class="noc-card" style="grid-column: span 3; flex-direction: row; gap: 15px;">
+                    <div style="flex: 1;">
+                        <h4>Event for Seconds</h4>
+                        <div class="chart-grid-bg"
+                            style="height: 120px; border-left: 1px solid #333; border-bottom: 1px solid #333; position: relative;">
+                            <div class="spark-wave" style="animation-duration: 5s;"></div>
+                        </div>
+                        <div style="display: flex; gap: 10px; margin-top: 5px; font-size: 0.5rem; color: #333;">
+                            <span>06:00</span><span>10:00</span><span>14:00</span>
+                        </div>
+                    </div>
+                    <div style="text-align: right; width: 100px;">
+                        <h4>Number Process</h4>
+                        <div class="noc-big-val" style="font-size: 2.22rem;">140</div>
+                        <h4 style="margin-top: 15px;">Users Logged</h4>
+                        <div class="noc-big-val" style="color: #58a6ff;">4</div>
+                    </div>
+                </div>
+
+                <!-- Row 2: Compliance and Frameworks -->
+                <div style="grid-column: span 12;" class="section-header">Compliance and Frameworks</div>
+
+                <div class="noc-card" style="grid-column: span 6; flex-direction: row; gap: 15px;">
+                    <div style="flex: 1;">
+                        <h4>Vulnerability LVL</h4>
+                        <div class="chart-grid-bg"
+                            style="height: 150px; display: flex; align-items: flex-end; gap: 2px; padding-left: 10px; border-left: 1px solid #333; border-bottom: 1px solid #333;">
+                            <div style="height: 10%; width: 4px; background: #eb2f06;"></div>
+                            <div style="height: 15%; width: 4px; background: #f39c12;"></div>
+                            <div style="height: 90%; width: 4px; background: #2ea043;"></div>
+                            <div style="height: 20%; width: 4px; background: #eb2f06;"></div>
+                        </div>
+                    </div>
+                    <div class="chart-legend" style="width: 100px;">
+                        <div class="legend-item"><span class="legend-color" style="background: #eb2f06;"></span> LVL: 15
+                        </div>
+                        <div class="legend-item"><span class="legend-color" style="background: #f39c12;"></span> LVL: 12
+                        </div>
+                        <div class="legend-item"><span class="legend-color" style="background: #2ea043;"></span> LVL:
+                            1-3
+                        </div>
+                    </div>
+                </div>
+
+                <div class="noc-card" style="grid-column: span 6; flex-direction: row; gap: 15px;">
+                    <div style="flex: 1;">
+                        <h4>Firewall - Count</h4>
+                        <div class="chart-grid-bg"
+                            style="height: 150px; border-left: 1px solid #333; border-bottom: 1px solid #333; background: #000;">
+                            <div class="spark-wave" style="opacity: 0.3; animation-delay: 1s;"></div>
+                        </div>
+                    </div>
+                    <div class="chart-legend" style="width: 100px;">
+                        <div class="legend-item"><span class="legend-color" style="background: #2ea043;"></span>
+                            Firewall
+                        </div>
+                        <div style="font-size: 0.8rem; font-weight: bold; margin-top: 10px;">2432</div>
+                        <div style="font-size: 0.6rem; color: #8b949e;">Total Count</div>
+                    </div>
+                </div>
+
+                <!-- Row 3: Security Donuts -->
+                <div class="noc-card" style="grid-column: span 4; flex-direction: row; gap: 15px; align-items: center;">
+                    <div style="flex: 1;">
+                        <h4>Mitre ID</h4>
+                        <div class="donut-sim" style="background: conic-gradient(#58a6ff 0% 53%, #1f1f23 53% 100%);">
+                        </div>
+                    </div>
+                    <div class="chart-legend">
+                        <div class="legend-item"><span class="legend-color" style="background: #58a6ff;"></span> T1570
+                            (53%)</div>
+                        <div class="legend-item"><span class="legend-color" style="background: #f39c12;"></span> T1136
+                            (9%)</div>
+                        <div class="legend-item"><span class="legend-color" style="background: #2ea043;"></span> T1058
+                            (8%)</div>
+                    </div>
+                </div>
+
+                <div class="noc-card" style="grid-column: span 4; flex-direction: row; gap: 15px; align-items: center;">
+                    <div style="flex: 1;">
+                        <h4>LGPD</h4>
+                        <div class="donut-sim" style="background: conic-gradient(#2ea043 0% 63%, #1f1f23 63% 100%);">
+                        </div>
+                    </div>
+                    <div class="chart-legend">
+                        <div class="legend-item"><span class="legend-color" style="background: #2ea043;"></span> IV.32.2
+                            (63%)</div>
+                        <div class="legend-item"><span class="legend-color" style="background: #f39c12;"></span> IV.35.7
+                            (35%)</div>
+                    </div>
+                </div>
+
+                <div class="noc-card" style="grid-column: span 4; flex-direction: row; gap: 15px; align-items: center;">
+                    <div style="flex: 1;">
+                        <h4>Rule Groups</h4>
+                        <div class="donut-sim" style="background: conic-gradient(#f39c12 0% 48%, #1f1f23 48% 100%);">
+                        </div>
+                    </div>
+                    <div class="chart-legend">
+                        <div class="legend-item"><span class="legend-color" style="background: #f39c12;"></span> Windows
+                            (48%)</div>
+                        <div class="legend-item"><span class="legend-color" style="background: #58a6ff;"></span> Syslog
+                            (24%)</div>
+                    </div>
+                </div>
+            </div>
+
+            <div style="margin-top: 20px; display: flex; gap: 10px;">
+                <button id="btn-expand-graphs" class="btn" style="background: #1c1c1e; border: 1px solid #333;"
+                    onclick="toggleFullscreenGraphs()">Expandir Gráficos</button>
+                <a class="btn btn-secondary" href="https://console.cloud.wazuh.com/console/new-environment"
+                    target="_blank" style="text-decoration: none;">Acessar Wazuh Original</a>
             </div>
         </section>
 
@@ -212,19 +381,25 @@
                     <div class="form-group">
                         <label>Função (Role)</label>
                         <select id="user-role">
-                            <option value="Colaborador">Colaborador (Visualizador)</option>
-                            <option value="Gestor">Gestor (Relatórios)</option>
+                            <option value="Funcionario">Funcionário (Colaborador)</option>
+                            <option value="Coordenador">Coordenador (Operacional)</option>
+                            <option value="Gerente">Gerente (Gestão)</option>
                             <option value="Admin">Administrador (Total)</option>
                         </select>
                     </div>
                     <div class="form-group">
-                        <label>Sistemas Autorizados</label>
+                        <label>Áreas de Acesso (Sistemas)</label>
                         <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 5px; font-size: 0.8rem;">
                             <label style="display:flex; gap:5px;"><input type="checkbox" value="SORS"> SORS</label>
                             <label style="display:flex; gap:5px;"><input type="checkbox" value="TOTVS"> TOTVS</label>
                             <label style="display:flex; gap:5px;"><input type="checkbox" value="RH"> RH</label>
                             <label style="display:flex; gap:5px;"><input type="checkbox" value="Financeiro">
                                 Financeiro</label>
+                            <label style="display:flex; gap:5px;"><input type="checkbox" value="GED"> GED</label>
+                            <label style="display:flex; gap:5px;"><input type="checkbox" value="Projetos">
+                                Projetos</label>
+                            <label style="display:flex; gap:5px;"><input type="checkbox" value="Juridico">
+                                Jurídico</label>
                         </div>
                     </div>
                 </div>
@@ -237,8 +412,8 @@
         <section id="quilbe" class="view">
             <div class="chat-container">
                 <div class="chat-messages" id="chat-messages">
-                    <div class="message quilbe">
-                        Olá Joana! Estou pronto para processar dados de SORS, TOTVS, RH e seus outros sistemas. O que
+                    <div class="message quilbe" id="quilbe-greeting">
+                        Olá! Estou pronto para processar dados de SORS, TOTVS, RH e seus outros sistemas. O que
                         você precisa analisar agora?
                     </div>
                 </div>

@@ -317,18 +317,201 @@ body.logged-in #login-overlay {
     pointer-events: none;
 }
 
-.admin-link {
-    display: none;
+/* --- PREMIUM MONITORING DASHBOARD (NOC) --- */
+.noc-dashboard {
+    background: #000000 !important;
+    padding: 1.5rem;
+    color: #efefef;
+    min-height: 100vh;
 }
 
-body.admin-session .admin-link {
+.noc-grid {
+    display: grid;
+    grid-template-columns: repeat(12, 1fr);
+    gap: 15px;
+}
+
+.noc-card {
+    background: #0d0d0f;
+    border: 1px solid #1c1c1e;
+    border-radius: 4px;
+    padding: 15px;
+    position: relative;
+    overflow: hidden;
     display: flex;
 }
 
-table tr {
-    border-bottom: 1px solid rgba(48, 54, 61, 0.5);
+.noc-card h4 {
+    color: #c9d1d9;
+    font-size: 0.8rem;
+    margin-bottom: 12px;
+    font-weight: 500;
 }
 
-table tr:last-child {
-    border-bottom: none;
+.section-header {
+    color: #c9d1d9;
+    font-size: 0.9rem;
+    font-weight: bold;
+    margin: 20px 0 10px 0;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    grid-column: span 12;
+}
+
+.section-header::before {
+    content: '⌄';
+    font-size: 1.2rem;
+    color: #8b949e;
+}
+
+/* Semi-Circle Gauges */
+.gauge-box {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    flex: 1;
+}
+
+.gauge-svg {
+    width: 130px;
+    height: 65px;
+}
+
+.gauge-bg {
+    fill: none;
+    stroke: #1c1c1e;
+    stroke-width: 14;
+    stroke-linecap: round;
+}
+
+.gauge-fill {
+    fill: none;
+    stroke: #2ea043;
+    stroke-width: 14;
+    stroke-linecap: round;
+    stroke-dashoffset: 188.5;
+    stroke-dasharray: 188.5;
+    transition: stroke-dashoffset 2s ease-out;
+}
+
+.gauge-val {
+    position: absolute;
+    bottom: 0px;
+    font-size: 1.1rem;
+    font-weight: bold;
+    color: #efefef;
+}
+
+/* Big Value Metrics */
+.noc-big-val {
+    font-size: 2.8rem;
+    font-weight: bold;
+    color: #2ea043;
+    text-align: right;
+}
+
+/* Legends & Detailed Charts */
+.chart-grid-bg {
+    background-image:
+        linear-gradient(rgba(48, 54, 61, 0.2) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(48, 54, 61, 0.2) 1px, transparent 1px);
+    background-size: 20px 20px;
+}
+
+.chart-legend {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    margin-top: 5px;
+}
+
+.legend-item {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 0.65rem;
+    color: #8b949e;
+    white-space: nowrap;
+}
+
+.legend-color {
+    width: 8px;
+    height: 8px;
+    border-radius: 2px;
+}
+
+/* Sparklines & Animations */
+.scanline {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.05) 50%);
+    background-size: 100% 4px;
+    pointer-events: none;
+    z-index: 100;
+}
+
+.spark-wave {
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent 50%, rgba(46, 160, 67, 0.1) 50%);
+    background-size: 40px 100%;
+    animation: slide-bg 3s linear infinite;
+}
+
+@keyframes slide-bg {
+    from {
+        background-position: 0 0;
+    }
+
+    to {
+        background-position: 40px 0;
+    }
+}
+
+/* Donut Charts */
+.donut-sim {
+    width: 70px;
+    height: 70px;
+    margin: 10px auto;
+    border-radius: 50%;
+    position: relative;
+    border: 4px solid #1c1c1e;
+}
+
+.donut-sim::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 45px;
+    height: 45px;
+    background: #0d0d0f;
+    border-radius: 50%;
+}
+
+/* Fullscreen Mode for Graphs */
+#monitoramento.fullscreen-mode {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    z-index: 9999;
+    background: #0d1117;
+    margin: 0;
+    padding: 2rem;
+    overflow-y: auto;
+}
+
+#monitoramento.fullscreen-mode .noc-grid {
+    transform: scale(1.1);
+    transform-origin: top center;
+    margin-bottom: 5rem;
 }
