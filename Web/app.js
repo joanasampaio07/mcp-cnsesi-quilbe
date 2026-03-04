@@ -1,3 +1,8 @@
+// =================================================================
+// CONFIGURAÇÃO GLOBAL — Backend API (Flask + SQL Server)
+// =================================================================
+const MCP_API_BASE = 'http://10.100.6.128:5000';
+
 // Load initial data from localStorage or use defaults
 let systems = JSON.parse(localStorage.getItem('mcp_systems')) || [
     { id: "SORS", name: "SORS - Sistema de Orçamento", host: "10.0.1.45", db: "SesiSORS", user: "admin_sors", status: "Online" },
@@ -196,7 +201,7 @@ async function testRealConnection() {
     resultEl.innerText = '⏳ Testando conexão com o SQL Server...';
 
     try {
-        const response = await fetch('/api/test-connection', {
+        const response = await fetch(`${MCP_API_BASE}/api/test-connection`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ host, database: db, user, password: pass })
