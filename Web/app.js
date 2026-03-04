@@ -153,7 +153,11 @@ function openEdit(id) {
     document.getElementById('db-name').value = editingSystem.db;
     document.getElementById('db-user').value = editingSystem.user;
     document.getElementById('db-pass').value = '********';
-    document.getElementById('edit-form').style.display = 'block';
+    document.getElementById('connection-test-result').style.color = 'var(--text-muted)';
+    document.getElementById('connection-test-result').innerText = "Preencha os campos acima e clique em 'Testar Conexão Real' para validar o acesso ao SQL Server.";
+    const form = document.getElementById('edit-form');
+    form.style.display = 'block';
+    setTimeout(() => form.scrollIntoView({ behavior: 'smooth', block: 'start' }), 50);
 }
 
 function closeEdit() {
