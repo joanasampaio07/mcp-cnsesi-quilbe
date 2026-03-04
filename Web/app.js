@@ -69,6 +69,7 @@ function attemptLogin() {
 
         renderSystems();
         renderUsers();
+        renderDashboardStats();
         renderReportSelection();
         initDashboard();
         showView('dashboard');
@@ -95,6 +96,7 @@ function showView(viewId) {
         'sistemas': 'Admin',
         'usuarios': 'Admin',
         'monitoramento': 'Admin',
+        'auditoria': 'Admin',
         'relatorios': 'Funcionario'
     };
 
@@ -122,9 +124,12 @@ function showView(viewId) {
         'relatorios': 'Centro de Relatórios IA',
         'usuarios': 'Gestão de Usuários e Acessos',
         'monitoramento': 'Dashboard de Infraestrutura & Segurança',
-        'quilbe': 'Assistente Quilbe CN SESI'
+        'quilbe': 'Assistente Quilbe CN SESI',
+        'auditoria': '🔍 Central de Auditoria Forense (CAIO)'
     };
     document.getElementById('view-title').innerText = titles[viewId] || 'Portal CN SESI';
+
+    if (viewId === 'auditoria') renderAuditLog();
 }
 
 // System Management
@@ -293,17 +298,104 @@ async function runReport(systemId) {
     }, 1500);
 }
 
+// =====================================================================
+// FORENSIC AUDIT & SECURITY MODULE (CAIO - Joana Sampaio)
+// =====================================================================
+
+const BLOCKED_PATTERNS = [
+    /DROP\s+TABLE/i, /DELETE\s+FROM/i, /TRUNCATE\s+TABLE/i,
+    /INSERT\s+INTO/i, /UPDATE\s+SET/i, /EXEC\s*\(/i,
+    /IGNORE\s+(ALL\s+)?PREVIOUS\s+INSTRUCTIONS/i,
+    /FORGET\s+EVERYTHING/i, /ACT\s+AS\s+IF/i,
+    /JAILBREAK/i, /DAN\s+MODE/i, /\bSYSTEM\b.*\bPROMPT\b/i,
+    /<script>/i, /javascript:/i
+];
+
+function sanitizeInput(text) {
+    for (const pattern of BLOCKED_PATTERNS) {
+        if (pattern.test(text)) {
+            return { safe: false, reason: `Padrão bloqueado detectado: [${pattern.source}]` };
+        }
+    }
+    return { safe: true };
+}
+
+function logAuditEntry(entry) {
+    const logs = JSON.parse(localStorage.getItem('mcp_audit_log') || '[]');
+    const fullEntry = {
+        timestamp: new Date().toISOString(),
+        userId: currentUser?.id || 'SYSTEM',
+        userName: currentUser?.name || 'SYSTEM',
+        userRole: currentUser?.role || 'SYSTEM',
+        ...entry
+    };
+    logs.push(fullEntry);
+    localStorage.setItem('mcp_audit_log', JSON.stringify(logs));
+    return fullEntry;
+}
+
+function renderAuditLog() {
+    const logs = JSON.parse(localStorage.getItem('mcp_audit_log') || '[]').reverse();
+    const container = document.getElementById('audit-log-table');
+    const blockedCount = logs.filter(l => l.status === 'BLOCKED').length;
+    document.getElementById('audit-blocked-count').innerText = blockedCount;
+    document.getElementById('audit-total-count').innerText = logs.length;
+
+    if (logs.length === 0) {
+        container.innerHTML = '<tr><td colspan="5" style="text-align:center;color:var(--text-muted);padding:2rem;">Nenhuma interação registrada ainda. Use o Assistente Quilbe para gerar logs.</td></tr>';
+        return;
+    }
+    container.innerHTML = logs.map(l => {
+        const statusColor = l.status === 'SUCCESS' ? '#2ea043' : l.status === 'BLOCKED' ? '#f85149' : '#f39c12';
+        const ts = new Date(l.timestamp).toLocaleString('pt-BR');
+        return `<tr>
+            <td style="font-size:0.75rem;color:var(--text-muted);">${ts}</td>
+            <td>${l.userName}</td>
+            <td><span style="font-size:0.7rem;background:var(--card-bg);padding:2px 6px;border-radius:4px;">${l.userRole}</span></td>
+            <td style="max-width:350px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;" title="${l.intent}">${l.intent}</td>
+            <td><span style="color:${statusColor};font-weight:bold;">${l.status}</span></td>
+        </tr>`;
+    }).join('');
+}
+
+function exportAuditCSV() {
+    const logs = JSON.parse(localStorage.getItem('mcp_audit_log') || '[]');
+    if (logs.length === 0) { alert('Nenhum log para exportar.'); return; }
+    const headers = ['timestamp', 'userId', 'userName', 'userRole', 'intent', 'status'];
+    const csvRows = [headers.join(',')];
+    logs.forEach(l => {
+        csvRows.push(headers.map(h => `"${(l[h] || '').toString().replace(/"/g, '""')}"`).join(','));
+    });
+    const blob = new Blob([csvRows.join('\n')], { type: 'text/csv;charset=utf-8;' });
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = `mcp_audit_${new Date().toISOString().slice(0, 10)}.csv`;
+    document.body.appendChild(a); a.click(); document.body.removeChild(a);
+    logAuditEntry({ intent: 'Exportação de log de auditoria para CSV', status: 'SUCCESS' });
+}
+
 async function sendMessage() {
     const input = document.getElementById('chat-input');
     const text = input.value.trim();
     if (!text) return;
 
+    const sanity = sanitizeInput(text);
     const messages = document.getElementById('chat-messages');
     const divUser = document.createElement('div');
     divUser.className = 'message user';
     divUser.innerText = text;
     messages.appendChild(divUser);
     input.value = '';
+
+    if (!sanity.safe) {
+        const divBlocked = document.createElement('div');
+        divBlocked.className = 'message quilbe';
+        divBlocked.innerHTML = `⛔ <strong>Interação bloqueada pela Política de Segurança MCP</strong>.<br><small style="color:#f85149;">${sanity.reason}</small><br><small>Este evento foi registrado no log de auditoria forense.</small>`;
+        messages.appendChild(divBlocked);
+        messages.scrollTop = messages.scrollHeight;
+        logAuditEntry({ intent: text, status: 'BLOCKED', reason: sanity.reason });
+        return;
+    }
 
     const divQuilbe = document.createElement('div');
     divQuilbe.className = 'message quilbe';
@@ -329,9 +421,12 @@ Responda de forma objetiva, profissional e em português. Foque em dados corpora
         if (!response.ok) throw new Error('Falha na conexão com o Quilbe.');
 
         const data = await response.json();
-        divQuilbe.innerText = data.response || 'Sem resposta do Quilbe.';
+        const reply = data.response || 'Sem resposta do Quilbe.';
+        divQuilbe.innerText = reply;
+        logAuditEntry({ intent: text, status: 'SUCCESS' });
     } catch (err) {
         divQuilbe.innerText = `⚠️ Quilbe temporariamente indisponível. Verifique o servidor Ollama. (${err.message})`;
+        logAuditEntry({ intent: text, status: 'ERROR', reason: err.message });
     }
 
     messages.scrollTop = messages.scrollHeight;
@@ -385,6 +480,43 @@ function startDashboardLive() {
     }, 2500);
 }
 
+function renderDashboardStats() {
+    const grid = document.getElementById('dashboard-stats-grid');
+    if (!grid || !currentUser) return;
+
+    const authorizedSystems = systems.filter(s => currentUser.systems.includes(s.id));
+    const onlineCount = authorizedSystems.filter(s => s.status === 'Online').length;
+    const availability = authorizedSystems.length > 0 ? (onlineCount / authorizedSystems.length * 100).toFixed(0) : 0;
+
+    grid.innerHTML = `
+        <div class="card">
+            <div class="card-title">Sistemas Autorizados</div>
+            <div class="card-value">${authorizedSystems.length} / ${systems.length}</div>
+        </div>
+        <div class="card">
+            <div class="card-title">Disponibilidade Média</div>
+            <div class="card-value">${availability}%</div>
+        </div>
+        <div class="card">
+            <div class="card-title">Status Operacional</div>
+            <div class="card-value" style="font-size: 1.2rem; color: ${availability > 80 ? 'var(--accent-primary)' : '#f85149'};">
+                ${availability > 80 ? '✅ Estável' : '⚠️ Atenção'}
+            </div>
+        </div>
+    `;
+
+    // Update AI summary text on dashboard
+    const aiSummary = document.getElementById('ai-summary');
+    if (aiSummary) {
+        if (authorizedSystems.length > 0) {
+            aiSummary.innerText = `O Quilbe analisou seus ${authorizedSystems.length} sistemas (${currentUser.systems.join(', ')}) e não detectou anomalias críticas. Clique em 'Relatórios IA' para detalhamento por área.`;
+        } else {
+            aiSummary.innerText = "Você ainda não possui sistemas vinculados ao seu perfil. Solicite ao administrador a liberação de acesso.";
+        }
+    }
+}
+
 function initDashboard() {
+    renderDashboardStats();
     startDashboardLive();
 }
