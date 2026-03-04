@@ -122,7 +122,6 @@
                 </div>
             </div>
 
-            <!-- Modal/Form de Edição (Simulado) -->
             <div id="edit-form" class="card"
                 style="display: none; margin-top: 1.5rem; border-color: var(--accent-primary);">
                 <h4 id="edit-title">Editar Conexão</h4>
@@ -136,16 +135,27 @@
                         <input type="text" id="db-name">
                     </div>
                     <div class="form-group">
-                        <label>Usuário</label>
+                        <label>Usuário SQL</label>
                         <input type="text" id="db-user">
                     </div>
                     <div class="form-group">
-                        <label>Senha</label>
-                        <input type="password" id="db-pass">
+                        <label>Senha SQL Server</label>
+                        <input type="password" id="db-pass" placeholder="Digite a senha para testar a conexão">
                     </div>
                 </div>
-                <button class="btn" onclick="saveSystemConfig()">Salvar Alterações</button>
-                <button class="btn" style="background: var(--text-muted);" onclick="closeEdit()">Cancelar</button>
+
+                <!-- Resultado do Teste de Conexao -->
+                <div id="connection-test-result"
+                    style="margin: 1rem 0; padding: 0.75rem 1rem; background: var(--card-bg); border-radius: 6px; font-size: 0.85rem; min-height: 40px; color: var(--text-muted);">
+                    Preencha os campos acima e clique em 'Testar Conexão Real' para validar o acesso ao SQL Server.
+                </div>
+
+                <div style="display: flex; gap: 0.75rem; flex-wrap: wrap;">
+                    <button class="btn" onclick="testRealConnection()" style="background: #1f6feb; flex: 1;">🔌 Testar
+                        Conexão Real</button>
+                    <button class="btn" onclick="saveSystemConfig()" style="flex: 1;">Salvar Alterações</button>
+                    <button class="btn" style="background: var(--text-muted);" onclick="closeEdit()">Cancelar</button>
+                </div>
             </div>
         </section>
 
@@ -482,7 +492,8 @@
                             style="color: var(--text-primary);">Política de Segurança ativa:</strong> Comandos como
                         <code>DROP TABLE</code>, <code>DELETE FROM</code>, <code>JAILBREAK</code> e padrões de Prompt
                         Injection são automaticamente bloqueados e registrados como <strong
-                            style="color: #f85149;">SECURITY_ALERT</strong> nesta trilha.</p>
+                            style="color: #f85149;">SECURITY_ALERT</strong> nesta trilha.
+                    </p>
                 </div>
             </div>
         </section>

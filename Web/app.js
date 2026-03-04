@@ -165,10 +165,58 @@ function saveSystemConfig() {
     editingSystem.db = document.getElementById('db-name').value;
     editingSystem.user = document.getElementById('db-user').value;
 
+    if (document.getElementById('db-pass').value !== '********') {
+        editingSystem.password = document.getElementById('db-pass').value;
+    }
+
     alert(`Integração com ${editingSystem.id} atualizada com sucesso!`);
     closeEdit();
     persistData();
     renderSystems();
+}
+
+async function testRealConnection() {
+    const host = document.getElementById('db-host').value;
+    const db = document.getElementById('db-name').value;
+    const user = document.getElementById('db-user').value;
+    const pass = document.getElementById('db-pass').value;
+    const resultEl = document.getElementById('connection-test-result');
+
+    if (!host || !db || !user || !pass || pass === '********') {
+        resultEl.style.color = '#f39c12';
+        resultEl.innerText = '⚠️ Preencha todos os campos incluindo a senha antes de testar.';
+        return;
+    }
+
+    resultEl.style.color = '#8b949e';
+    resultEl.innerText = '⏳ Testando conexão com o SQL Server...';
+
+    try {
+        const response = await fetch('/api/test-connection', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ host, database: db, user, password: pass })
+        });
+        const data = await response.json();
+
+        if (data.success) {
+            resultEl.style.color = '#2ea043';
+            resultEl.innerHTML = `✅ <strong>${data.message}</strong><br><small>Servidor: ${data.details?.server} | Tabelas: ${data.details?.tables} | Versão: ${data.details?.version?.substring(0, 60)}...</small>`;
+            // Update system status to Online
+            if (editingSystem) {
+                editingSystem.status = 'Online';
+                persistData();
+            }
+            logAuditEntry({ intent: `Teste de conexão SQL Server: ${host}/${db}`, status: 'SUCCESS' });
+        } else {
+            resultEl.style.color = '#f85149';
+            resultEl.innerHTML = `❌ <strong>Falha:</strong> ${data.message}`;
+            logAuditEntry({ intent: `Teste de conexão SQL Server: ${host}/${db}`, status: 'ERROR', reason: data.message });
+        }
+    } catch (err) {
+        resultEl.style.color = '#f85149';
+        resultEl.innerHTML = `❌ <strong>Backend API offline.</strong> Verifique se o mcp_api.py está rodando no servidor Ubuntu.<br><small>${err.message}</small>`;
+    }
 }
 
 function saveAIConfig() {
